@@ -1,0 +1,69 @@
+body{
+	color: #ffffff;
+	height:100%;
+	width:100%;
+	background: url(1.jpg);
+	background-size: cover;
+	background-attachment: fixed;
+}
+h1{
+	border: 1px solid white;
+}
+.sun{
+	margin-left:35%;
+	height:500px;
+	width:500px;
+}
+.sun1{
+	left:100px;
+	height:300px;
+	width:700px;
+}
+.Mercury{
+	margin-top:0;
+	margin-left:45%;
+	height:125px;
+	width:150px;
+}
+.Venera{
+	margin-top:0;
+	margin-left:43%;
+	height:150px;
+	width:200px;
+}
+.Earth{
+	margin-top:0;
+	margin-left:43%;
+	height:215px;
+	width:200px;
+}
+.Mars{
+	margin-top:0;
+	margin-left:42%;
+	height:200px;
+	width:225px;
+}
+.Upiter{
+	margin-top:0;
+	margin-left:35%;
+	height:350px;
+	width:450px;
+}
+.Saturn{
+	margin-top:0;
+	margin-left:40%;
+	height:300px;
+	width:300px;
+}
+.Uran{
+	margin-top:0;
+	margin-left:40%;
+	height:250px;
+	width:290px;
+}
+.Neptun{
+	margin-top:0;
+	margin-left:43%;
+	height:200px;
+	width:200px;
+}
