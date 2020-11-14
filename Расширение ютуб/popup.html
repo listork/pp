@@ -4,14 +4,24 @@
     <meta charset="UTF-8">
     <style>
         button {
-            height: 30px;
-            width: 30px;
+            height: 50px;
+            width: 150px;
             outline: none;
+        }
+        #translateSentence{
+            background-color: #215DC6;
+        }
+        #translateWord{
+            background-color: aquamarine;
         }
     </style>
 </head>
 <body>
-<button id="changeColor"></button>
+<input type="hidden" id="session_id"/>
+<button id="translateWord">Перевод слов</button>
+<button id="translateSentence">Перевод предложений</button>
+<a id="session" href = "https://smgen.ru/view.php" target = _blank>Статистика</a>
+<!--<button id="translateYandex">Перевод в яндекс</button>-->
 <script src="dict.js"></script>
 <script src="popup.js"></script>
 </body>

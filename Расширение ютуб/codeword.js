@@ -1,0 +1,138 @@
+if (typeof translations === "undefined") {
+    var translations;
+}
+translations = '%translations_json%';
+session_id = '%session_id%';
+console.log(translations);
+var el1 = document.querySelector("body");
+el1.setAttribute("data-wa", "1");
+let subtitleon = document.querySelector(".ytp-subtitles-button");
+if (subtitleon.getAttribute('aria-pressed') !== 'true') {
+    subtitleon.click();
+}
+(function () {
+    setInterval(function () {
+        let subtitlestring = document.querySelector(".ytp-caption-segment");
+        subtitlestring.onmousemove = function () {
+            let playbutton = document.querySelector(".ytp-play-button");
+            if (playbutton.getAttribute('aria-label') !== 'Смотреть (k)') {
+                playbutton.click();
+            }
+        };
+    }, 300);
+}());
+setInterval(function () {
+    if (document.querySelector("body").getAttribute("data-wa") !== "1") {
+        return;
+    }
+    if (document.getElementById("caption-window-1") === null) {
+        return;
+    }
+    let spans = document.getElementById("caption-window-1").childNodes;
+    for (let i = 0; i < spans.length; i++) {
+        if (typeof spans[i] !== 'undefined' && spans[i].className === 'captions-text') {
+            let spans2 = spans[i].childNodes;
+            for (let j = 0; j < spans2.length; j++) {
+                if (typeof spans2[j] !== 'undefined' && spans2[j].className === 'caption-visual-line') {
+                    let spans3 = spans2[j].childNodes;
+                    for (let k = 0; k < spans3.length; k++) {
+                        if (typeof spans3[k] !== 'undefined' && spans3[k].className === 'ytp-caption-segment') {
+                            if (spans3[k].getAttribute('translated') !== '1') {
+                                let subtitle = spans3[k].innerText;
+                                let subtitle_words = subtitle.split(/[^\w]+/);
+                                // console.log(subtitle_words);
+                                subtitle = mt(subtitle_words);
+
+                                spans3[k].innerHTML = subtitle;
+                                spans3[k].setAttribute("translated", "1");
+                                let spans4 = spans3[k].childNodes;
+                                for (let n = 0; n < spans4.length; n++){
+                                    if (typeof spans4[n] !== 'undefined'&& spans4[n].className === 'translate-word'){
+                                        spans4[n].onmouseover = function (){
+                                            stats(this.innerText);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}, 300);
+
+function t(word) {
+    if (typeof translations[word] !== 'undefined') {
+        word = translations[word];
+    }
+    return word;
+}
+
+function mt(subtitle_words) {
+    let out = [];
+    let besttranslation = '';
+    let combination = [];
+    let last_word_added = 0;
+    for (let i = 0; i < subtitle_words.length; i++) {
+        combination.push(subtitle_words[i]);
+        let r = new RegExp('^' + combination.join(' '));
+        let rfull = new RegExp('^' + combination.join(' ')+'$');
+        let translationfound = false;
+        for (let word in translations) {
+            if (translations.hasOwnProperty(word)) {
+                if (word.match(rfull)) {
+                    besttranslation = translations[word];
+                    translationfound = true;
+                    break;
+                }
+                if (word.match(r)) {
+                    besttranslation = translations[word];
+                    translationfound = true;
+                }
+            }
+        }
+        if (!translationfound || i === (subtitle_words.length - 1)) {
+            let real_combination = combination.slice(0,combination.length-1);
+            let phrase = real_combination.join(' ');
+            console.log('phrase:',phrase);
+
+
+            if(besttranslation==''){
+                if(last_word_added<i) {
+                    besttranslation = subtitle_words[i];
+                    out.push(besttranslation);
+                    last_word_added = i;
+                }
+            }else {
+                out.push('<span class="translate-word" style="border: 1px dotted #666; border-radius: 3px" title="' + besttranslation + '">' + phrase + '</span>');
+                //last_word_added = i;
+            }
+
+            if (combination.length > 1) {
+                combination = [];
+                i--;
+            }
+
+            besttranslation = '';
+        }
+    }
+    return out.join(' ');
+}
+function stats(word, element){
+    console.log("stats:", word);
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === 4) {
+            // console.log(this.responseText);
+            // let result = JSON.parse(this.responseText);
+            // let subtitletranslation = result['translations'][0]['text'];
+            // let subtitle = ' <span style="border: 1px dashed #600; border-radius: 3px" title="' + subtitletranslation + '">' + sentence + '</span>';
+            // element.innerHTML = subtitle;
+        }
+    });
+    xhr.open("GET", "https://smgen.ru/stat.php?word="+word + "&sid=" + session_id, true);
+    xhr.setRequestHeader("Content-Type", "text/plain");
+
+    xhr.send();
+}
