@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        button {
+            height: 50px;
+            width: 150px;
+            outline: none;
+        }
+        #translateSentence{
+            background-color: #215DC6;
+        }
+        #translateWord{
+            background-color: aquamarine;
+        }
+    </style>
+</head>
+<body>
+<input type="hidden" id="session_id"/>
+<button id="translateWord">Перевод слов</button>
+<button id="translateSentence">Перевод предложений</button>
+<a id="session" href = "https://smgen.ru/view.php" target = _blank>Статистика</a>
+<script src="dict.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
