@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>xxx</title>
+    <style type="text/css">
+        .hover_div{
+            cursor: pointer;
+            outline: 1px dotted #000;
+        }
+
+        .hover_span{
+            cursor: pointer;
+            outline: 1px dotted #f00;
+        }
+        #custom_title{
+            /*position: absolute;*/
+            /*background: #6699cc;*/
+            /*padding: 3px 5px;*/
+        }
+    </style>
+</head>
+<body>
+Lorem <div class="hover_div" title="abc">
+    blablabla
+</div> ipsum <span class="hover_span" title="dfg">
+    blablabla
+</span>dolor sit amet
+
+<script type="application/javascript">
+    let titled = document.querySelectorAll('.hover_span,.hover_div');
+    for(let i=0; i<titled.length; i++){
+        doHover(titled[i],titled[i].title);
+        titled[i].title = '';
+    }
+    function doHover(element,title) {
+        element.onmouseover = function(event){
+            let title_span = document.querySelector('#custom_title');
+            if(title_span===null){
+                title_span = document.createElement('div');
+                title_span.id = 'custom_title';
+                title_span.style.position = "absolute";
+                title_span.style.background = "#6699cc";
+                title_span.style.padding = "3px 5px";
+                title_span.style.fontSize = "3em";
+                document.body.appendChild(title_span);
+            }
+            title_span.style.display = 'block';
+            title_span.style.top = event.clientY+5+"px";
+            title_span.style.left = event.clientX+5+"px";
+            // title_span.innerText = element.title;
+            title_span.innerText = title;
+        }
+        element.onmouseout = function () {
+            let title_span = document.querySelector('#custom_title');
+            if(title_span!==null){
+                title_span.style.display = 'none';
+            }
+        }
+    }
+
+
+</script>
+</body>
+</html>

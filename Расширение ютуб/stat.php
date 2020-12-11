@@ -5,38 +5,23 @@ if (isset($_GET["sid"])){
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-//define('STATS_FILE', "stats.json");
-//if (!file_exists(STATS_FILE)){
-//    $f = fopen(STATS_FILE, "w");
-//    fclose($f);
-//}
-//$fbody = file_get_contents(STATS_FILE);
-//$dict = json_decode($fbody, true);
 if (empty($_SESSION["dict"])){
     $_SESSION["dict"] = array();
 }
 $dict = $_SESSION["dict"];
-//if (empty($dict)){
-//    $dict = array();
-//}
-if (isset ($word)){
-    file_put_contents("log.txt", print_r($word,1));
-    foreach ($word as $worditem){
-        if (!isset($dict[$worditem])) {
-            $dict[$worditem] = 0;
-        }
-        $dict[$worditem]++;
-    }
-//    file_put_contents(STATS_FILE, json_encode($dict));
-$_SESSION["dict"] = $dict;
-}
 if (isset($_GET["word"])) {
     $word = $_GET["word"];
-    if (!isset($dict[$word])) {
-        $dict[$word] = 0;
+    $tr = "";
+    if (isset($_GET["tr"])) {
+        $tr = $_GET["tr"];
     }
-    $dict[$word]++;
-//    file_put_contents(STATS_FILE, json_encode($dict));
+    if (!isset($dict[$word])) {
+        $dict[$word] = array("amount" => 0, "translation" => $tr);
+    }
+    $dict[$word]["amount"]++;
+    if (!empty($tr)) {
+        $dict[$word]["translation"] = $tr;
+    }
+//   заносим статистику пользователя
     $_SESSION["dict"] = $dict;
-    print_r(session_id());
 }

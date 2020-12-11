@@ -3,7 +3,6 @@ if (typeof translations === "undefined") {
 }
 translations = '%translations_json%';
 session_id = '%session_id%';
-console.log(translations);
 var el1 = document.querySelector("body");
 el1.setAttribute("data-wa", "1");
 let subtitleon = document.querySelector(".ytp-subtitles-button");
@@ -40,17 +39,17 @@ setInterval(function () {
                             if (spans3[k].getAttribute('translated') !== '1') {
                                 let subtitle = spans3[k].innerText;
                                 let subtitle_words = subtitle.split(/[^\w]+/);
-                                // console.log(subtitle_words);
                                 subtitle = mt(subtitle_words);
-
                                 spans3[k].innerHTML = subtitle;
                                 spans3[k].setAttribute("translated", "1");
                                 let spans4 = spans3[k].childNodes;
                                 for (let n = 0; n < spans4.length; n++){
                                     if (typeof spans4[n] !== 'undefined'&& spans4[n].className === 'translate-word'){
-                                        spans4[n].onmouseover = function (){
-                                            stats(this.innerText);
-                                        }
+                                        // spans4[n].onmouseover = function (){
+                                        //     // функция отправки статисктики при наведении мышкой
+                                        // }
+                                        doHover(spans4[n], spans4[n].title);
+                                        spans4[n].title = '';
                                     }
                                 }
                             }
@@ -61,52 +60,54 @@ setInterval(function () {
         }
     }
 }, 300);
-
-function t(word) {
-    if (typeof translations[word] !== 'undefined') {
-        word = translations[word];
-    }
-    return word;
-}
-
 function mt(subtitle_words) {
     let out = [];
     let besttranslation = '';
     let combination = [];
+    // закончить перевод и начать переводить с того слова, которое мы еще не переводили
     let last_word_added = 0;
     for (let i = 0; i < subtitle_words.length; i++) {
         combination.push(subtitle_words[i]);
+        // фраза разделена пробелами
         let r = new RegExp('^' + combination.join(' '));
+        // если точное совпадение фразы, то переводим
         let rfull = new RegExp('^' + combination.join(' ')+'$');
+        // до сих пор не нашли перевод
         let translationfound = false;
         for (let word in translations) {
             if (translations.hasOwnProperty(word)) {
+                // слово из словаря совпадает полностью, не перебираем словарь дальше
                 if (word.match(rfull)) {
                     besttranslation = translations[word];
                     translationfound = true;
                     break;
                 }
+                // если найдено частичное совпадение, пишем перевод, но продолжаем перебирать словарь, вдруг найдется точное совпадение
                 if (word.match(r)) {
                     besttranslation = translations[word];
                     translationfound = true;
                 }
             }
         }
+        //   не нашли перевод     конец предложения
         if (!translationfound || i === (subtitle_words.length - 1)) {
+            //   фраза без последнего слова
             let real_combination = combination.slice(0,combination.length-1);
+            // фраза через пробелы
             let phrase = real_combination.join(' ');
-            console.log('phrase:',phrase);
-
-
+            // проверяем, что перевод не найден
             if(besttranslation==''){
+                // если последнее слово не является текущим
                 if(last_word_added<i) {
+                    // переводим
                     besttranslation = subtitle_words[i];
+                    // кладем в массив вывода
                     out.push(besttranslation);
+                    // говорим, что последнее слово есть текущее
                     last_word_added = i;
                 }
             }else {
                 out.push('<span class="translate-word" style="border: 1px dotted #666; border-radius: 3px" title="' + besttranslation + '">' + phrase + '</span>');
-                //last_word_added = i;
             }
 
             if (combination.length > 1) {
@@ -117,22 +118,40 @@ function mt(subtitle_words) {
             besttranslation = '';
         }
     }
+    // возвращает значение переведенной фразы разделенной пробелами
     return out.join(' ');
 }
-function stats(word, element){
-    console.log("stats:", word);
+function stats(word, translation, element){
     var xhr = new XMLHttpRequest();
-    xhr.addEventListener("readystatechange", function () {
-        if (this.readyState === 4) {
-            // console.log(this.responseText);
-            // let result = JSON.parse(this.responseText);
-            // let subtitletranslation = result['translations'][0]['text'];
-            // let subtitle = ' <span style="border: 1px dashed #600; border-radius: 3px" title="' + subtitletranslation + '">' + sentence + '</span>';
-            // element.innerHTML = subtitle;
-        }
-    });
-    xhr.open("GET", "https://smgen.ru/stat.php?word="+word + "&sid=" + session_id, true);
+    xhr.open("GET", "https://smgen.ru/stat.php?word="+word+ "&tr=" + translation + "&sid=" + session_id, true);
     xhr.setRequestHeader("Content-Type", "text/plain");
 
     xhr.send();
+}
+function doHover(element,title) {
+    element.onmouseover = function(event){
+        let title_span = document.querySelector('#custom_title');
+        if(title_span===null){
+            title_span = document.createElement('div');
+            title_span.id = 'custom_title';
+            title_span.style.position = "absolute";
+            title_span.style.background = "#6699cc";
+            title_span.style.padding = "3px 5px";
+            title_span.style.fontSize = "3em";
+            document.body.appendChild(title_span);
+        }
+        title_span.style.display = 'block';
+        title_span.style.top = event.clientY+5+"px";
+        title_span.style.left = event.clientX+5+"px";
+        // title_span.innerText = element.title;
+        title_span.innerText = title;
+        stats(element.innerText, title);
+
+    }
+    element.onmouseout = function () {
+        let title_span = document.querySelector('#custom_title');
+        if(title_span!==null){
+            title_span.style.display = 'none';
+        }
+    }
 }
